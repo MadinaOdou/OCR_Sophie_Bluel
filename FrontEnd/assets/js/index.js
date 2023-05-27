@@ -1,9 +1,3 @@
-// fetch("http://localhost:5678/api/categories")
-//   .then((response) => response.json())
-//   .then((categories) => {
-//     console.log(categories);
-//   });
-
 const works = fetch("http://localhost:5678/api/works")
   .then((response) => response.json())
   .then((works) => genererElements(works));
@@ -24,3 +18,50 @@ function genererElements(works) {
 }
 
 genererElements(works);
+
+// fetch("http://localhost:5678/api/categories")
+//   .then((response) => response.json())
+//   .then((categories) => {
+//     console.log(categories);
+//   });
+
+const boutonTous = document.querySelector(".tous");
+
+boutonTous.addEventListener("click", function () {
+  document.querySelector(".gallery").innerHTML = "";
+  fetch("http://localhost:5678/api/works")
+    .then((response) => response.json())
+    .then((works) => genererElements(works));
+});
+
+const boutonObjets = document.querySelector(".objets");
+
+boutonObjets.addEventListener("click", function () {
+  document.querySelector(".gallery").innerHTML = "";
+  fetch("http://localhost:5678/api/works")
+    .then((response) => response.json())
+    .then((data) => data.filter((x) => x.category.name === "Objets"))
+    .then((resultat) => genererElements(resultat));
+});
+
+const boutonAppartements = document.querySelector(".appartements");
+
+boutonAppartements.addEventListener("click", function () {
+  document.querySelector(".gallery").innerHTML = "";
+  fetch("http://localhost:5678/api/works")
+    .then((response) => response.json())
+    .then((data) => data.filter((x) => x.category.name === "Appartements"))
+    .then((resultat) => genererElements(resultat));
+});
+
+const boutonHotelsRestaurants = document.querySelector(".hotelsRestaurants");
+
+boutonHotelsRestaurants.addEventListener("click", function () {
+  document.querySelector(".gallery").innerHTML = "";
+  fetch("http://localhost:5678/api/works")
+    .then((response) => response.json())
+    .then((data) =>
+      data.filter((x) => x.category.name === "Hotels & restaurants")
+    )
+    .then((resultat) => genererElements(resultat));
+});
