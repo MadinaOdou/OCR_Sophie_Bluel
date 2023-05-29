@@ -2,6 +2,20 @@
 //   .then((response) => response.json())
 //   .then((works) => genererElements(works));
 
+function switchToModeAdmin() {
+  if (localStorage.getItem("token")) {
+    document.querySelector(".filterButtons").style.display = "none";
+    document.querySelectorAll(".admin-mode").forEach((x) => {
+      x.classList.remove("admin-mode");
+    });
+    document.querySelector(".login-out").innerText = "logout";
+  } else {
+    console.log("utilisateur déconnecté");
+  }
+}
+
+switchToModeAdmin();
+
 function genererElements(works) {
   for (let i = 0; i < works.length; i++) {
     const sectionGallery = document.querySelector(".gallery");

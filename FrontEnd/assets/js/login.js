@@ -18,7 +18,7 @@ function submitBtn(event) {
       if (response.ok) {
         return response.json();
       } else {
-        throw new Error("Invalid email or password");
+        alert("Erreur dans l’identifiant ou le mot de passe");
       }
     })
     .then((data) => {
@@ -29,7 +29,6 @@ function submitBtn(event) {
     })
     .catch((error) => {
       console.error(error);
-      alert("Invalid email or password");
     });
 }
 
