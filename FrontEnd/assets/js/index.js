@@ -25,7 +25,6 @@ function selectBtn() {
   btnSelected.forEach((btn) => {
     btn.classList.remove("active");
   });
-  this.classList.add("active");
 }
 
 async function getWorks() {
@@ -44,29 +43,32 @@ async function getWorks() {
   boutonTous.addEventListener("click", function () {
     document.querySelector(".gallery").innerHTML = "";
     genererElements(allWorks);
+    selectBtn();
     boutonTous.classList.add("active");
-    selectBtn.call(boutonTous);
   });
 
   const boutonObjets = document.querySelector(".objets");
   boutonObjets.addEventListener("click", function () {
     document.querySelector(".gallery").innerHTML = "";
     genererElements(objets);
-    selectBtn.call(boutonObjets);
+    selectBtn();
+    boutonObjets.classList.add("active");
   });
 
   const boutonAppartements = document.querySelector(".appartements");
   boutonAppartements.addEventListener("click", function () {
     document.querySelector(".gallery").innerHTML = "";
     genererElements(appartements);
-    selectBtn.call(boutonAppartements);
+    selectBtn();
+    boutonAppartements.classList.add("active");
   });
 
   const boutonHotelsRestaurants = document.querySelector(".hotelsRestaurants");
   boutonHotelsRestaurants.addEventListener("click", function () {
     document.querySelector(".gallery").innerHTML = "";
     genererElements(hotelsRestaurants);
-    selectBtn.call(boutonHotelsRestaurants);
+    selectBtn();
+    boutonHotelsRestaurants.classList.add("active");
   });
 }
 

@@ -128,12 +128,16 @@ table {
   border-spacing: 0;
 }
 /** end reset css**/
-body {
+.homepage {
   max-width: 1140px;
   margin: auto;
+}
+
+body {
   font-family: "Work Sans";
   font-size: 14px;
 }
+
 header {
   display: flex;
   justify-content: space-between;
@@ -287,4 +291,49 @@ footer nav ul {
   display: flex;
   justify-content: flex-end;
   margin: 2em;
+}
+
+/* Page de login */
+
+.container {
+  background-color: #fffef8;
+  padding: 10px 150px 0;
+}
+
+.login {
+  text-align: center;
+  padding: 150px 0 355px;
+}
+
+.login div {
+  display: flex;
+  flex-direction: column;
+}
+
+.login div,
+.login a {
+  color: #3d3d3d;
+  font-weight: 500;
+}
+
+.login h2 {
+  padding-bottom: 20px;
+}
+
+.form-email-password div {
+  margin: 16px auto;
+  text-align: left;
+}
+
+.form-email-password input {
+  width: 379px;
+  height: 51px;
+  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+  border: none;
+  margin-top: 7px;
+}
+
+.btn-login {
+  height: 36px;
+  border: none;
 }
