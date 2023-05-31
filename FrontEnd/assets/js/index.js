@@ -88,6 +88,109 @@ async function getWorks() {
 
 getWorks();
 
+let modal = null;
+
+const openModal = function (e) {
+  e.preventDefault();
+  modal = document.querySelector(e.target.getAttribute("href"));
+  modal.style.display = null;
+  modal.removeAttribute("aria-hidden");
+  modal.setAttribute("aria-modal", "true");
+  modal.addEventListener("click", closeModal);
+  modal.querySelector(".btn-close").addEventListener("click", closeModal);
+  modal.querySelector(".stop-modal").addEventListener("click", stopPropagation);
+};
+
+const closeModal = function (e) {
+  if (modal === null) return;
+  e.preventDefault();
+  modal.style.display = "none";
+  modal.setAttribute("aria-hidden", "true");
+  modal.removeAttribute("aria-modal");
+  modal.removeEventListener("click", closeModal);
+  modal.querySelector(".btn-close").removeEventListener("click", closeModal);
+  modal
+    .querySelector(".stop-modal")
+    .removeEventListener("click", stopPropagation);
+  modal = null;
+};
+
+const stopPropagation = function (e) {
+  e.stopPropagation();
+};
+
+document.querySelectorAll(".link-edit").forEach((a) => {
+  a.addEventListener("click", openModal);
+});
+
+async function deleteItem() {
+  const works = await fetch("http://localhost:5678/api/works");
+  const allWorks = await works.json();
+  const btnTrash = document.querySelectorAll(".btn-trash");
+  btnTrash.forEach((a) => {
+    a.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const photo = event.target.closest("figure");
+      const photoId = photo.dataset.id;
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:5678/api/works/${photoId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        photo.remove();
+
+        const index = allWorks.findIndex((work) => work.id === photoId);
+        if (index !== -1) {
+          allWorks.splice(index, 1);
+        }
+      } else {
+        console.error("Erreur");
+      }
+    });
+  });
+}
+
+function loadGallery(works) {
+  const photoGallery = document.querySelector(".photo-elements");
+
+  for (let i = 0; i < works.length; i++) {
+    const workElement = document.createElement("figure");
+    workElement.dataset.id = works[i].id;
+    const imageElement = document.createElement("img");
+    imageElement.src = works[i].imageUrl;
+    const buttonTrash = document.createElement("button");
+    const iconTrash = document.createElement("i");
+    const textElement = document.createElement("figcaption");
+    textElement.innerText = "éditer";
+
+    workElement.appendChild(imageElement);
+    workElement.appendChild(textElement);
+    workElement.appendChild(buttonTrash);
+    buttonTrash.appendChild(iconTrash);
+
+    buttonTrash.classList.add("btn-trash");
+    iconTrash.classList.add("fa-solid");
+    iconTrash.classList.add("fa-trash-can");
+
+    photoGallery.appendChild(workElement);
+  }
+}
+
+async function getAllWorks(event) {
+  const works = await fetch("http://localhost:5678/api/works");
+  const allWorks = await works.json();
+  loadGallery(allWorks);
+  deleteItem();
+}
+
+getAllWorks();
+
 // fetch("http://localhost:5678/api/categories")
 //   .then((response) => response.json())
 //   .then((categories) => {
