@@ -112,7 +112,27 @@ const closeModal = function (e) {
   modal
     .querySelector(".stop-modal")
     .removeEventListener("click", stopPropagation);
+
+  if (modal.id === "modal-add-photo") {
+    const galleryModal = document.querySelector("#modal-gallery");
+    galleryModal.style.display = "none";
+    galleryModal.setAttribute("aria-hidden", "true");
+    galleryModal.removeAttribute("aria-modal");
+  }
+
   modal = null;
+};
+
+const openPreviousModal = function (e) {
+  e.preventDefault();
+  const addPhotoModal = document.querySelector("#modal-add-photo");
+  addPhotoModal.style.display = "none";
+  addPhotoModal.setAttribute("aria-hidden", "true");
+  addPhotoModal.removeAttribute("aria-modal");
+  const galleryModal = document.querySelector("#modal-gallery");
+  galleryModal.style.display = null;
+  galleryModal.removeAttribute("aria-hidden");
+  galleryModal.setAttribute("aria-modal", "true");
 };
 
 const stopPropagation = function (e) {
@@ -122,6 +142,12 @@ const stopPropagation = function (e) {
 document.querySelectorAll(".link-edit").forEach((a) => {
   a.addEventListener("click", openModal);
 });
+
+document.querySelector(".btn-add-photo").addEventListener("click", openModal);
+
+document
+  .querySelector(".fa-arrow-left-long")
+  .addEventListener("click", openPreviousModal);
 
 async function deleteItem() {
   const works = await fetch("http://localhost:5678/api/works");
@@ -166,6 +192,8 @@ function loadGallery(works) {
     imageElement.src = works[i].imageUrl;
     const buttonTrash = document.createElement("button");
     const iconTrash = document.createElement("i");
+    const buttonArrows = document.createElement("button");
+    const iconArrows = document.createElement("i");
     const textElement = document.createElement("figcaption");
     textElement.innerText = "éditer";
 
@@ -173,12 +201,29 @@ function loadGallery(works) {
     workElement.appendChild(textElement);
     workElement.appendChild(buttonTrash);
     buttonTrash.appendChild(iconTrash);
+    workElement.appendChild(buttonArrows);
+    buttonArrows.appendChild(iconArrows);
+    photoGallery.appendChild(workElement);
+
+    buttonArrows.style.display = "none";
 
     buttonTrash.classList.add("btn-trash");
     iconTrash.classList.add("fa-solid");
     iconTrash.classList.add("fa-trash-can");
 
-    photoGallery.appendChild(workElement);
+    workElement.addEventListener("mouseover", function () {
+      buttonArrows.classList.add("btn-arrows");
+      iconArrows.classList.add("fa-solid");
+      iconArrows.classList.add("fa-arrows-up-down-left-right");
+      buttonArrows.style.display = "block";
+    });
+
+    workElement.addEventListener("mouseout", function () {
+      buttonArrows.classList.remove("btn-arrows");
+      iconArrows.classList.remove("fa-solid");
+      iconArrows.classList.remove("fa-arrows-up-down-left-right");
+      buttonArrows.style.display = "none";
+    });
   }
 }
 
