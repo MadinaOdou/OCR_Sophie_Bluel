@@ -1,7 +1,3 @@
-// const works = fetch("http://localhost:5678/api/works")
-//   .then((response) => response.json())
-//   .then((works) => genererElements(works));
-
 function switchToModeAdmin() {
   if (localStorage.getItem("token")) {
     document.querySelector(".filterButtons").style.display = "none";
@@ -236,49 +232,80 @@ async function getAllWorks(event) {
 
 getAllWorks();
 
-// fetch("http://localhost:5678/api/categories")
-//   .then((response) => response.json())
-//   .then((categories) => {
-//     console.log(categories);
-//   });
+function addNewWork() {
+  const form = document.querySelector(".form-add-photo");
+  const sectionGallery = document.querySelector(".gallery");
+  const newFile = document.querySelector(".area-add-file");
+  const fileInput = document.querySelector("#file");
 
-// const boutonTous = document.querySelector(".tous");
+  fileInput.addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const previewFile = document.createElement("img");
+      previewFile.src = e.target.result;
+      newFile.appendChild(previewFile);
+      const btnAddFile = document.querySelector(".add-file");
+      btnAddFile.style.display = "none";
+    };
+    reader.readAsDataURL(file);
+  });
 
-// boutonTous.addEventListener("click", function () {
-//   document.querySelector(".gallery").innerHTML = "";
-//   fetch("http://localhost:5678/api/works")
-//     .then((response) => response.json())
-//     .then((works) => genererElements(works));
-// });
+  const btnConfirm = document.querySelector(".btn-confirm");
+  const title = document.querySelector("#title");
+  const category = document.querySelector("#category");
 
-// const boutonObjets = document.querySelector(".objets");
+  function checkForm() {
+    if (title.value && category.value && fileInput.files[0]) {
+      btnConfirm.classList.add("active-mode");
+    } else {
+      btnConfirm.classList.remove("active-mode");
+    }
+  }
 
-// boutonObjets.addEventListener("click", function () {
-//   document.querySelector(".gallery").innerHTML = "";
-//   fetch("http://localhost:5678/api/works")
-//     .then((response) => response.json())
-//     .then((data) => data.filter((x) => x.category.name === "Objets"))
-//     .then((resultat) => genererElements(resultat));
-// });
+  title.addEventListener("input", checkForm);
+  category.addEventListener("input", checkForm);
 
-// const boutonAppartements = document.querySelector(".appartements");
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-// boutonAppartements.addEventListener("click", function () {
-//   document.querySelector(".gallery").innerHTML = "";
-//   fetch("http://localhost:5678/api/works")
-//     .then((response) => response.json())
-//     .then((data) => data.filter((x) => x.category.name === "Appartements"))
-//     .then((resultat) => genererElements(resultat));
-// });
+    if (!title.value || !category.value || !fileInput.files[0]) {
+      alert("Veuillez remplir tous les champs du formulaire.");
+      return;
+    }
 
-// const boutonHotelsRestaurants = document.querySelector(".hotelsRestaurants");
+    const formData = new FormData();
 
-// boutonHotelsRestaurants.addEventListener("click", function () {
-//   document.querySelector(".gallery").innerHTML = "";
-//   fetch("http://localhost:5678/api/works")
-//     .then((response) => response.json())
-//     .then((data) =>
-//       data.filter((x) => x.category.name === "Hotels & restaurants")
-//     )
-//     .then((resultat) => genererElements(resultat));
-// });
+    formData.append("image", fileInput.files[0]);
+    formData.append("title", title.value);
+    formData.append("category", category.value);
+
+    console.log(formData);
+
+    const token = localStorage.getItem("token");
+    fetch("http://localhost:5678/api/works", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Erreur");
+        }
+      })
+      .then((data) => {
+        const newImage = document.createElement("img");
+        newImage.src = data.imageUrl;
+        sectionGallery.appendChild(newImage);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  });
+}
+
+addNewWork();
