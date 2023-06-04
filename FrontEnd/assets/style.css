@@ -136,6 +136,7 @@ table {
 body {
   font-family: "Work Sans";
   font-size: 14px;
+  background: #fffef8;
 }
 
 body a {
@@ -148,6 +149,12 @@ header {
   justify-content: space-between;
   margin: 50px 0;
 }
+
+footer {
+  background: white;
+  height: 60px;
+}
+
 section {
   margin: 50px 0;
 }
@@ -183,12 +190,15 @@ nav li {
   font-size: 1.2em;
 }
 
-li:hover {
+li:hover,
+li a:hover {
   color: #b1663c;
+  cursor: pointer;
 }
 #introduction {
   display: flex;
   align-items: center;
+  margin-bottom: 108px;
 }
 #introduction figure {
   flex: 1;
@@ -220,6 +230,7 @@ li:hover {
   grid-template-columns: 1fr 1fr 1fr;
   grid-column-gap: 20px;
   grid-row-gap: 20px;
+  margin-top: 70px;
 }
 
 .gallery img {
@@ -229,7 +240,7 @@ li:hover {
 .filterButtons {
   display: flex;
   justify-content: center;
-  margin: 50px;
+  margin-top: 50px;
   gap: 10px;
 }
 
@@ -300,6 +311,8 @@ li:hover {
 footer nav ul {
   display: flex;
   justify-content: flex-end;
+  padding-top: 24px;
+  padding-right: 107px;
   margin: 2em;
 }
 
@@ -330,6 +343,14 @@ footer nav ul {
 
 .login h2 {
   padding-bottom: 20px;
+}
+
+.login-form a {
+  text-decoration: underline;
+}
+
+li span {
+  font-weight: 600;
 }
 
 .form-email-password div {

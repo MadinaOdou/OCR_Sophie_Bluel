@@ -240,6 +240,19 @@ function addNewWork() {
 
   fileInput.addEventListener("change", function (event) {
     const file = event.target.files[0];
+    const fileSizeLimit = 4 * 1024 * 1024;
+    if (file.size > fileSizeLimit) {
+      alert("Erreur : La taille du fichier dépasse 4 Mo");
+      fileInput.value = "";
+      return;
+    }
+
+    const allowedFormats = ["image/jpeg", "image/png"];
+    if (!allowedFormats.includes(file.type)) {
+      alert("Erreur ! Formats autorisés : JPG, PNG");
+      fileInput.value = "";
+      return;
+    }
     const reader = new FileReader();
     reader.onload = function (e) {
       const previewFile = document.createElement("img");
