@@ -27,6 +27,8 @@ function genererElements(works) {
   }
 }
 
+// Réalisation du filtre des travaux
+
 const allBtn = document.querySelectorAll(".btn-filter");
 allBtn[0].classList.add("active");
 
@@ -36,6 +38,8 @@ function selectBtn() {
     btn.classList.remove("active");
   });
 }
+
+// Récupération des travaux depuis le back-end
 
 async function getWorks() {
   const works = await fetch("http://localhost:5678/api/works");
@@ -83,6 +87,8 @@ async function getWorks() {
 }
 
 getWorks();
+
+// Ajout de la fenêtre modale
 
 let modal = null;
 
@@ -144,6 +150,8 @@ document.querySelector(".btn-add-photo").addEventListener("click", openModal);
 document
   .querySelector(".fa-arrow-left-long")
   .addEventListener("click", openPreviousModal);
+
+// Suppression de travaux existants
 
 async function deleteItem() {
   const works = await fetch("http://localhost:5678/api/works");
@@ -223,7 +231,7 @@ function loadGallery(works) {
   }
 }
 
-async function getAllWorks(event) {
+async function getAllWorks() {
   const works = await fetch("http://localhost:5678/api/works");
   const allWorks = await works.json();
   loadGallery(allWorks);
@@ -232,9 +240,11 @@ async function getAllWorks(event) {
 
 getAllWorks();
 
+// Envoi d’un nouveau projet au back-end via le
+// formulaire de la modale
+
 function addNewWork() {
   const form = document.querySelector(".form-add-photo");
-  const sectionGallery = document.querySelector(".gallery");
   const newFile = document.querySelector(".area-add-file");
   const fileInput = document.querySelector("#file");
 
@@ -311,14 +321,33 @@ function addNewWork() {
         }
       })
       .then((data) => {
+        const sectionGallery = document.querySelector(".gallery");
+        const workItem = document.createElement("figure");
         const newImage = document.createElement("img");
         newImage.src = data.imageUrl;
-        sectionGallery.appendChild(newImage);
+        const titleImage = document.createElement("figcaption");
+        titleImage.innerText = data.title;
+
+        sectionGallery.appendChild(workItem);
+        workItem.appendChild(newImage);
+        workItem.appendChild(titleImage);
+
+        closeAllModals();
       })
       .catch((error) => {
         console.error(error);
       });
   });
+  function closeAllModals() {
+    const addPhotoModal = document.querySelector("#modal-add-photo");
+    addPhotoModal.style.display = "none";
+    addPhotoModal.setAttribute("aria-hidden", "true");
+    addPhotoModal.removeAttribute("aria-modal");
+    const galleryModal = document.querySelector("#modal-gallery");
+    galleryModal.style.display = "none";
+    galleryModal.setAttribute("aria-hidden", "true");
+    galleryModal.removeAttribute("aria-modal");
+  }
 }
 
 addNewWork();
