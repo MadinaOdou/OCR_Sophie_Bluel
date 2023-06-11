@@ -1,62 +1,26 @@
-function switchToModeAdmin() {
-  if (localStorage.getItem("token")) {
-    document.querySelector(".filterButtons").style.display = "none";
-    document.querySelectorAll(".admin-mode").forEach((x) => {
-      x.classList.remove("admin-mode");
-    });
-    document.querySelector(".login-out").innerText = "logout";
-  } else {
-    console.log("utilisateur déconnecté");
+const urlBase = "http://localhost:5678/api";
+
+async function dataFetch(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error("Erreur");
   }
+  return await response.json();
 }
-
-switchToModeAdmin();
-
-function genererElements(works) {
-  for (let i = 0; i < works.length; i++) {
-    const sectionGallery = document.querySelector(".gallery");
-    const workElement = document.createElement("figure");
-    const imageElement = document.createElement("img");
-    imageElement.src = works[i].imageUrl;
-    const nomElement = document.createElement("figcaption");
-    nomElement.innerText = works[i].title;
-
-    sectionGallery.appendChild(workElement);
-    workElement.appendChild(imageElement);
-    workElement.appendChild(nomElement);
-  }
-}
-
-// Réalisation du filtre des travaux
-
-const allBtn = document.querySelectorAll(".btn-filter");
-allBtn[0].classList.add("active");
-
-function selectBtn() {
-  const btnSelected = document.querySelectorAll(".btn-filter.active");
-  btnSelected.forEach((btn) => {
-    btn.classList.remove("active");
-  });
-}
-
-// Récupération des travaux depuis le back-end
 
 async function getWorks() {
-  const works = await fetch("http://localhost:5678/api/works");
-  const allWorks = await works.json();
-  genererElements(allWorks);
-  const objets = allWorks.filter((x) => x.category.name === "Objets");
-  const appartements = allWorks.filter(
-    (x) => x.category.name === "Appartements"
-  );
-  const hotelsRestaurants = allWorks.filter(
+  const works = await dataFetch(`${urlBase}/works`);
+  genererElements(works);
+  const objets = works.filter((x) => x.category.name === "Objets");
+  const appartements = works.filter((x) => x.category.name === "Appartements");
+  const hotelsRestaurants = works.filter(
     (x) => x.category.name === "Hotels & restaurants"
   );
 
   const boutonTous = document.querySelector(".tous");
   boutonTous.addEventListener("click", function () {
     document.querySelector(".gallery").innerHTML = "";
-    genererElements(allWorks);
+    genererElements(works);
     selectBtn();
     boutonTous.classList.add("active");
   });
@@ -84,15 +48,58 @@ async function getWorks() {
     selectBtn();
     boutonHotelsRestaurants.classList.add("active");
   });
+  loadGallery(works);
+  deleteItem();
 }
 
 getWorks();
+
+function genererElements(works) {
+  for (let i = 0; i < works.length; i++) {
+    const sectionGallery = document.querySelector(".gallery");
+    const workElement = document.createElement("figure");
+    const imageElement = document.createElement("img");
+    imageElement.src = works[i].imageUrl;
+    const nomElement = document.createElement("figcaption");
+    nomElement.innerText = works[i].title;
+
+    sectionGallery.appendChild(workElement);
+    workElement.appendChild(imageElement);
+    workElement.appendChild(nomElement);
+  }
+}
+
+function switchToModeAdmin() {
+  if (localStorage.getItem("token")) {
+    document.querySelector(".filterButtons").style.display = "none";
+    document.querySelectorAll(".admin-mode").forEach((x) => {
+      x.classList.remove("admin-mode");
+    });
+    document.querySelector(".login-out").innerText = "logout";
+  } else {
+    console.log("utilisateur déconnecté");
+  }
+}
+
+switchToModeAdmin();
+
+// Réalisation du filtre des travaux
+
+const allBtn = document.querySelectorAll(".btn-filter");
+allBtn[0].classList.add("active");
+
+function selectBtn() {
+  const btnSelected = document.querySelectorAll(".btn-filter.active");
+  btnSelected.forEach((btn) => {
+    btn.classList.remove("active");
+  });
+}
 
 // Ajout de la fenêtre modale
 
 let modal = null;
 
-const openModal = function (e) {
+const openModal = async function (e) {
   e.preventDefault();
   modal = document.querySelector(e.target.getAttribute("href"));
   modal.style.display = null;
@@ -154,31 +161,21 @@ document
 // Suppression de travaux existants
 
 async function deleteItem() {
-  const works = await fetch("http://localhost:5678/api/works");
-  const allWorks = await works.json();
+  const token = localStorage.getItem("token");
   const btnTrash = document.querySelectorAll(".btn-trash");
   btnTrash.forEach((a) => {
     a.addEventListener("click", async (event) => {
       event.preventDefault();
       const photo = event.target.closest("figure");
       const photoId = photo.dataset.id;
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:5678/api/works/${photoId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${urlBase}/works/${photoId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.ok) {
         photo.remove();
-
-        const index = allWorks.findIndex((work) => work.id === photoId);
-        if (index !== -1) {
-          allWorks.splice(index, 1);
-        }
       } else {
         console.error("Erreur");
       }
@@ -231,15 +228,6 @@ function loadGallery(works) {
   }
 }
 
-async function getAllWorks() {
-  const works = await fetch("http://localhost:5678/api/works");
-  const allWorks = await works.json();
-  loadGallery(allWorks);
-  deleteItem();
-}
-
-getAllWorks();
-
 // Envoi d’un nouveau projet au back-end via le
 // formulaire de la modale
 
@@ -289,7 +277,7 @@ function addNewWork() {
   title.addEventListener("input", checkForm);
   category.addEventListener("input", checkForm);
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     if (!title.value || !category.value || !fileInput.files[0]) {
@@ -306,20 +294,13 @@ function addNewWork() {
     console.log(formData);
 
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5678/api/works", {
+    await dataFetch(`${urlBase}/works`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
       },
       body: formData,
     })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Erreur");
-        }
-      })
       .then((data) => {
         const sectionGallery = document.querySelector(".gallery");
         const workItem = document.createElement("figure");
